@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloodLink - Connect Donors with Those in Need</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Global Styles */
+        :root {
+            --primary-color: #e63946;
+            --secondary-color: #1d3557;
+            --accent-color: #a8dadc;
+            --light-color: #f1faee;
+            --dark-color: #457b9d;
+            --text-color: #333;
+            --light-text: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            color: var(--text-color);
+            line-height: 1.6;
+            background-color: var(--light-color);
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #c1121f;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #14213d;
+        }
+
+        .btn-large {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--light-text);
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-links .btn {
+            margin-left: 20px;
+        }
+
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: var(--light-text);
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            animation: modalopen 0.5s;
+        }
+
+        @keyframes modalopen {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: var(--primary-color);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        /* Styled Select */
+        .styled-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 1em;
+            padding-right: 30px;
+            background-color: white;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
+            height: 100vh;
+            color: var(--light-text);
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Donation Section */
+        .donation-section {
+            padding: 80px 0;
+            background-color: var(--light-text);
+        }
+
+        .donation-section h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--primary-color);
+        }
+
+        .donation-form {
+            background-color: var(--light-color);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Eligibility Criteria */
+        .eligibility-criteria {
+            background-color: var(--light-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .eligibility-criteria h3 {
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .eligibility-criteria ul {
+            list-style-position: inside;
+            text-align: left;
+        }
+
+        .eligibility-criteria li {
+            margin-bottom: 8px;
+        }
+
+        /* Blood Request Section */
+        .blood-request {
+            padding: 80px 0;
+            background-color: var(--light-color);
+        }
+
+        .blood-request h2 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .blood-request p {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--text-color);
+        }
+
+        .request-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Recent Requests */
+        .recent-requests {
+            padding: 60px 0;
+            background-color: var(--light-text);
+        }
+
+        .recent-requests h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--secondary-color);
+        }
+
+        .requests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .request-card {
+            background-color: var(--light-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .request-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .request-card p {
+            margin-bottom: 5px;
+        }
+
+        .request-card .blood-type {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        /* Motivational Section */
+        .motivational {
+            padding: 60px 0;
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            text-align: center;
+        }
+
+        .quote {
+            max-width: 800px;
+            margin: 0 auto 40px;
+        }
+
+        .quote p {
+            font-size: 1.5rem;
+            font-style: italic;
+            margin: 20px 0;
+        }
+
+        .quote i {
+            font-size: 2rem;
+            color: var(--accent-color);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .stat-item {
+            margin: 20px;
+        }
+
+        .stat-item h3 {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+        }
+
+        /* Hospitals Section */
+        .hospitals {
+            padding: 80px 0;
+            background-color: var(--light-color);
+        }
+
+        .hospitals h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--secondary-color);
+        }
+
+        .hospital-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .hospital-card {
+            background-color: var(--light-text);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .hospital-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .hospital-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            padding: 60px 0 20px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul li a {
+            color: var(--light-text);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Confirmation Message */
+        .confirmation-message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--light-text);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            z-index: 3000;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .confirmation-message p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background-color: var(--light-text);
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: var(--shadow);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a, .nav-links .btn {
+                margin: 10px 0;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .hero-content p {
+                font-size: 1rem;
+            }
+
+            .stats {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="#home" class="logo">BloodLink</a>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#donate">Donate</a>
+                <a href="#request">Request</a>
+                <a href="#hospitals">Hospitals</a>
+                <a href="#about">About</a>
+                <button id="loginBtn" class="btn">Login</button>
+                <button id="signupBtn" class="btn btn-secondary">Sign Up</button>
+            </div>
+            <button class="hamburger">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Login to BloodLink</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="nationalId">National ID</label>
+                    <input type="text" id="nationalId" name="nationalId" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <p>Don't have an account? <a href="#" id="showSignup">Sign up</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Create Your BloodLink Account</h2>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="signupNationalId">National ID</label>
+                    <input type="text" id="signupNationalId" name="nationalId" required>
+                </div>
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="bloodType">Blood Type</label>
+                    <select id="bloodType" name="bloodType" required class="styled-select">
+                        <option value="">Select Blood Type</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password (min 8 characters)</label>
+                    <input type="password" id="signupPassword" name="password" minlength="8" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+                <button type="submit" class="btn">Register</button>
+                <p>Already have an account? <a href="#" id="showLogin">Login</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Donate Blood, Save Lives</h1>
+                <p>Join Egypt's largest blood donation network and help those in need</p>
+                <div class="hero-buttons">
+                    <button id="heroDonateBtn" class="btn btn-large">I Want to Donate</button>
+                    <button id="heroRequestBtn" class="btn btn-large btn-secondary">I Need Blood</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Donation Section -->
+    <section class="donation-section" id="donate">
+        <div class="container">
+            <h2>Ready to Donate Blood?</h2>
+            <div class="eligibility-criteria">
+                <h3>Eligibility Requirements:</h3>
+                <ul>
+                    <li>Age between 18-65 years</li>
+                    <li>Weight at least 50 kg</li>
+                    <li>No infectious diseases</li>
+                    <li>Not pregnant or breastfeeding</li>
+                    <li>No recent surgery (within 6 months)</li>
+                    <li>Hemoglobin level ≥12.5 g/dL for women, ≥13.5 g/dL for men</li>
+                </ul>
+            </div>
+            
+            <form id="donationForm" class="donation-form">
+                <h3>Schedule Your Donation</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="donorNationalId">National ID</label>
+                        <input type="text" id="donorNationalId" name="nationalId" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="donationBloodType">Your Blood Type</label>
+                        <select id="donationBloodType" name="bloodType" required class="styled-select">
+                            <option value="">Select Blood Type</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="donationHospital">Select Hospital</label>
+                        <select id="donationHospital" name="hospital" required class="styled-select">
+                            <option value="">Select Hospital</option>
+                            <option value="Cairo University Hospital">Cairo University Hospital</option>
+                            <option value="Ain Shams University Hospital">Ain Shams University Hospital</option>
+                            <option value="Alexandria Main University Hospital">Alexandria Main University Hospital</option>
+                            <option value="Kasr Al Ainy Hospital">Kasr Al Ainy Hospital</option>
+                            <option value="Demerdash Hospital">Demerdash Hospital</option>
+                            <option value="Mansoura University Hospital">Mansoura University Hospital</option>
+                            <option value="Assiut University Hospital">Assiut University Hospital</option>
+                            <option value="Tanta University Hospital">Tanta University Hospital</option>
+                            <option value="Zagazig University Hospital">Zagazig University Hospital</option>
+                            <option value="Beni Suef University Hospital">Beni Suef University Hospital</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="donationDate">Preferred Date</label>
+                        <input type="date" id="donationDate" name="date" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="eligible" required> 
+                        I confirm I meet all eligibility requirements
+                    </label>
+                </div>
+                <button type="submit" class="btn">Schedule Donation</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Blood Request Section -->
+    <section class="blood-request" id="request">
+        <div class="container">
+            <h2>Need Blood?</h2>
+            <p>Create a blood request that will be visible to donors in your area</p>
+            <form id="requestForm" class="request-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="requestBloodType">Blood Type Needed</label>
+                        <select id="requestBloodType" name="bloodType" required class="styled-select">
+                            <option value="">Select Blood Type</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="hospital">Hospital</label>
+                        <select id="hospital" name="hospital" required class="styled-select">
+                            <option value="">Select Hospital</option>
+                            <option value="Cairo University Hospital">Cairo University Hospital</option>
+                            <option value="Ain Shams University Hospital">Ain Shams University Hospital</option>
+                            <option value="Alexandria Main University Hospital">Alexandria Main University Hospital</option>
+                            <option value="Kasr Al Ainy Hospital">Kasr Al Ainy Hospital</option>
+                            <option value="Demerdash Hospital">Demerdash Hospital</option>
+                            <option value="Mansoura University Hospital">Mansoura University Hospital</option>
+                            <option value="Assiut University Hospital">Assiut University Hospital</option>
+                            <option value="Tanta University Hospital">Tanta University Hospital</option>
+                            <option value="Zagazig University Hospital">Zagazig University Hospital</option>
+                            <option value="Beni Suef University Hospital">Beni Suef University Hospital</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="requestDetails">Additional Details</label>
+                    <textarea id="requestDetails" name="details" rows="3" placeholder="Provide any additional information..."></textarea>
+                </div>
+                <button type="submit" class="btn">Submit Request</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Recent Requests -->
+    <section class="recent-requests">
+        <div class="container">
+            <h2>Recent Blood Requests</h2>
+            <div class="requests-grid" id="requestsContainer">
+                <!-- Sample requests will appear here -->
+                <div class="request-card">
+                    <span class="blood-type">B+</span>
+                    <h3>Ahmed Mohamed</h3>
+                    <p><strong>Hospital:</strong> Cairo University Hospital</p>
+                    <p>Urgent need for B+ blood for surgery patient.</p>
+                    <p class="date">2 hours ago</p>
+                </div>
+                <div class="request-card">
+                    <span class="blood-type">O-</span>
+                    <h3>Mona Ali</h3>
+                    <p><strong>Hospital:</strong> Ain Shams University Hospital</p>
+                    <p>Child with thalassemia needs regular transfusion.</p>
+                    <p class="date">5 hours ago</p>
+                </div>
+                <div class="request-card">
+                    <span class="blood-type">AB+</span>
+                    <h3>Youssef Hassan</h3>
+                    <p><strong>Hospital:</strong> Alexandria Main University Hospital</p>
+                    <p>Emergency case after accident, need 3 units.</p>
+                    <p class="date">1 day ago</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Motivational Section -->
+    <section class="motivational">
+        <div class="container">
+            <div class="quote">
+                <i class="fas fa-quote-left"></i>
+                <p>Every blood donor is a hero. Your single donation can save up to three lives.</p>
+                <i class="fas fa-quote-right"></i>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <h3>10,000+</h3>
+                    <p>Lives Saved</p>
+                </div>
+                <div class="stat-item">
+                    <h3>5,000+</h3>
+                    <p>Active Donors</p>
+                </div>
+                <div class="stat-item">
+                    <h3>50+</h3>
+                    <p>Partner Hospitals</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hospitals Section -->
+    <section class="hospitals" id="hospitals">
+        <div class="container">
+            <h2>Partner Hospitals in Egypt</h2>
+            <div class="hospital-list">
+                <div class="hospital-card">
+                    <h3>Cairo University Hospital</h3>
+                    <p>Location: Cairo</p>
+                    <p>Contact: 02 2365 1234</p>
+                </div>
+                <div class="hospital-card">
+                    <h3>Ain Shams University Hospital</h3>
+                    <p>Location: Cairo</p>
+                    <p>Contact: 02 2482 1234</p>
+                </div>
+                <div class="hospital-card">
+                    <h3>Alexandria Main University Hospital</h3>
+                    <p>Location: Alexandria</p>
+                    <p>Contact: 03 486 1234</p>
+                </div>
+                <div class="hospital-card">
+                    <h3>Kasr Al Ainy Hospital</h3>
+                    <p>Location: Cairo</p>
+                    <p>Contact: 02 2365 5678</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>BloodLink</h3>
+                    <p>Connecting blood donors with those in need across Egypt.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#donate">Donate</a></li>
+                        <li><a href="#request">Request</a></li>
+                        <li><a href="#hospitals">Hospitals</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p>Email: info@bloodlink.com</p>
+                    <p>Phone: 12345</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 BloodLink. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Confirmation Message -->
+    <div id="confirmationMessage" class="confirmation-message">
+        <p>Thank you for registering with BloodLink! A confirmation email has been sent to your address.</p>
+        <button id="closeConfirmation" class="btn">OK</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation elements
+            const navbar = document.querySelector('.navbar');
+            const navLinks = document.querySelector('.nav-links');
+            const hamburger = document.querySelector('.hamburger');
+            
+            // Modal elements
+            const loginModal = document.getElementById('loginModal');
+            const signupModal = document.getElementById('signupModal');
+            const loginBtn = document.getElementById('loginBtn');
+            const signupBtn = document.getElementById('signupBtn');
+            const heroDonateBtn = document.getElementById('heroDonateBtn');
+            const heroRequestBtn = document.getElementById('heroRequestBtn');
+            const showSignup = document.getElementById('showSignup');
+            const showLogin = document.getElementById('showLogin');
+            const closeButtons = document.querySelectorAll('.close');
+            const confirmationMessage = document.getElementById('confirmationMessage');
+            const closeConfirmation = document.getElementById('closeConfirmation');
+
+            // Form elements
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const requestForm = document.getElementById('requestForm');
+            const donationForm = document.getElementById('donationForm');
+            const requestsContainer = document.getElementById('requestsContainer');
+
+            // Sample data for recent requests
+            let requests = [
+                {
+                    name: "Ahmed Mohamed",
+                    bloodType: "B+",
+                    hospital: "Cairo University Hospital",
+                    details: "Urgent need for B+ blood for surgery patient.",
+                    date: "2 hours ago"
+                },
+                {
+                    name: "Mona Ali",
+                    bloodType: "O-",
+                    hospital: "Ain Shams University Hospital",
+                    details: "Child with thalassemia needs regular transfusion.",
+                    date: "5 hours ago"
+                },
+                {
+                    name: "Youssef Hassan",
+                    bloodType: "AB+",
+                    hospital: "Alexandria Main University Hospital",
+                    details: "Emergency case after accident, need 3 units.",
+                    date: "1 day ago"
+                }
+            ];
+
+            // Display requests
+            function displayRequests() {
+                requestsContainer.innerHTML = '';
+                requests.forEach(request => {
+                    const requestCard = document.createElement('div');
+                    requestCard.className = 'request-card';
+                    requestCard.innerHTML = `
+                        <span class="blood-type">${request.bloodType}</span>
+                        <h3>${request.name}</h3>
+                        <p><strong>Hospital:</strong> ${request.hospital}</p>
+                        <p>${request.details}</p>
+                        <p class="date">${request.date}</p>
+                    `;
+                    requestsContainer.appendChild(requestCard);
+                });
+            }
+
+            // Smooth scrolling for navigation
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        navLinks.classList.remove('active');
+                        
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 70,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Modal functions
+            function openModal(modal) {
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal(modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+
+            // Event listeners for modals
+            loginBtn.addEventListener('click', () => openModal(loginModal));
+            signupBtn.addEventListener('click', () => openModal(signupModal));
+            heroDonateBtn.addEventListener('click', () => {
+                window.location.href = '#donate';
+            });
+            heroRequestBtn.addEventListener('click', () => {
+                window.location.href = '#request';
+            });
+            showSignup.addEventListener('click', (e) => {
+                e.preventDefault();
+                closeModal(loginModal);
+                openModal(signupModal);
+            });
+            showLogin.addEventListener('click', (e) => {
+                e.preventDefault();
+                closeModal(signupModal);
+                openModal(loginModal);
+            });
+
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    closeModal(modal);
+                });
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === loginModal) closeModal(loginModal);
+                if (e.target === signupModal) closeModal(signupModal);
+            });
+
+            // Form validation and submission
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const nationalId = document.getElementById('nationalId').value;
+                const password = document.getElementById('password').value;
+                
+                if (!nationalId || !password) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+                
+                console.log('Login attempt with:', { nationalId, password });
+                closeModal(loginModal);
+            });
+
+            signupForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const nationalId = document.getElementById('signupNationalId').value;
+                const fullName = document.getElementById('fullName').value;
+                const bloodType = document.getElementById('bloodType').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('signupPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (!nationalId || !fullName || !bloodType || !email || !password || !confirmPassword) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match');
+                    return;
+                }
+                
+                if (password.length < 8) {
+                    alert('Password must be at least 8 characters');
+                    return;
+                }
+                
+                if (!email.includes('@')) {
+                    alert('Please enter a valid email address');
+                    return;
+                }
+                
+                console.log('Registration data:', { nationalId, fullName, bloodType, email, password });
+                
+                closeModal(signupModal);
+                confirmationMessage.style.display = 'block';
+            });
+
+            requestForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const bloodType = document.getElementById('requestBloodType').value;
+                const hospital = document.getElementById('hospital').value;
+                const details = document.getElementById('requestDetails').value;
+                
+                if (!bloodType || !hospital) {
+                    alert('Please select blood type and hospital');
+                    return;
+                }
+                
+                console.log('Blood request:', { bloodType, hospital, details });
+                
+                const newRequest = {
+                    name: "You",
+                    bloodType: bloodType,
+                    hospital: hospital,
+                    details: details || "No additional details provided.",
+                    date: "Just now"
+                };
+                
+                requests.unshift(newRequest);
+                displayRequests();
+                requestForm.reset();
+                
+                // Scroll to recent requests
+                window.scrollTo({
+                    top: document.querySelector('.recent-requests').offsetTop - 70,
+                    behavior: 'smooth'
+                });
+            });
+
+            donationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const nationalId = document.getElementById('donorNationalId').value;
+                const bloodType = document.getElementById('donationBloodType').value;
+                const hospital = document.getElementById('donationHospital').value;
+                const date = document.getElementById('donationDate').value;
+                
+                if (!nationalId || !bloodType || !hospital || !date) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                console.log('Donation scheduled:', { nationalId, bloodType, hospital, date });
+                alert('Thank you! Your donation appointment has been scheduled.');
+                donationForm.reset();
+            });
+
+            // Close confirmation message
+            closeConfirmation.addEventListener('click', function() {
+                confirmationMessage.style.display = 'none';
+            });
+
+            // Mobile menu toggle
+            hamburger.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+            });
+
+            // Initialize the page
+            displayRequests();
+        });
+    </script>
+</body>
+</html>
